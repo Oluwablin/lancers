@@ -455,9 +455,20 @@
 
 
                         <form method="post" action="/estimate/create/step5">
-                            <input type="hidden" name="_token" value="GO9XYWyEk9V6mDjxswf9yEihppAnMK9kyZwdOjIP">
+                            <!-- <input type="hidden" name="_token" value="GO9XYWyEk9V6mDjxswf9yEihppAnMK9kyZwdOjIP"> -->
+                            @csrf
 
-                                                                                            <div class="">
+
+@if(session('success'))<br> <div class="alert alert-success">{{session('success')}}</div>
+@elseif(session('error'))<br> <div class="">{{session('error')}}</div> @endif
+@if(session()->has('message.alert'))
+<div class="text-center">
+    <button class=" alert alert-{{ session('message.alert') }}"> 
+        {!! session('message.content') !!}
+    </button>
+</div>
+@endif
+                        <div class="">
                                 <label>  <h5>Business Information</h5></label>
                             </div>
                             <div class="clearfix"></div>
