@@ -438,19 +438,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label for="cc-exp" class="control-label">How much  do you charge per hour?</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control col-md-4 col-sm-10" required name="cost_per_hour" placeholder="NGN 0.00" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <br/>
+                                
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
