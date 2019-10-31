@@ -454,6 +454,7 @@
                         <div class="clearrfix"></div>
 
 
+
                         <form method="post" action="/estimate/create/step5">
                             <!-- <input type="hidden" name="_token" value="GO9XYWyEk9V6mDjxswf9yEihppAnMK9kyZwdOjIP"> -->
                             @csrf
@@ -469,6 +470,11 @@
 </div>
 @endif
                         <div class="">
+
+                        <form method="post" action="/estimate/create/step5"  id="form">
+                            @csrf
+                            <div class="">
+
                                 <label>  <h5>Business Information</h5></label>
                             </div>
                             <div class="clearfix"></div>

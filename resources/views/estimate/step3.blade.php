@@ -29,11 +29,60 @@
       border: 1px solid #919191;
     }
 
+
     .ctrl-btn {
       width: 100%;
       background-color: #FFFFFF;
       border: none;
     }
+
+    <div>
+      <button type="submit" class="next disabled" id="btn" >NEXT</button>
+    </div>
+  </div>
+
+  <h1 class="my-5 text-center">What Client is it for?</h1>
+
+<form action="/estimate/create/step4" method="post">
+    @csrf
+  <div class="row ">
+    <div class="col-md-6 p-0">
+      <div class="row m-auto box justify-content-center">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Select Client</h5>
+            <p class="card-text">Please select an already existing client on the platform</p>
+            
+            <select name="client" class="l-proj" style="color: #919191" oninput="verifyPath()" id="createProject" required>
+              <option value="new" selected>Select Client</option>
+              <option value="new">Client 1</option>
+              <option value="new">Client 2</option>
+              <option value="new">Client 3</option>
+              <option value="new">Client 4</option>
+            </select>
+          </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="col-md-6 p-0">
+<div class="row m-auto box justify-content-center">
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"   >New Client</h5>
+        <p class="card-text">Please Type here for new Client
+        </p>
+       <div class="project"style="border: none;"  >
+           <input class="l-proj" type="text" oninput="verifyPath()"  placeholder= "Project Name"  name="" id="createProject">
+           <br>
+           <span class="req">Required</span>
+       </div>
+    </div>
+</div>
+</div>
+</div>
+
 
     .inv-div {
       width: 60%;
@@ -64,6 +113,7 @@
       font-size: 28px;
       background-color:  rgba(196, 196, 196, 0.4);
     }
+
 
     .cli-info {
       width:75%;
@@ -275,7 +325,11 @@
     </div>
 </div>
 
+
+<button type="submit" class="btn disabled my-5 mx-auto" id="btn" >NEXT</button>
+
 </div>
+</form>
 @endsection
 
 @section('script')
@@ -284,5 +338,10 @@
         let form = document.querySelector('#form');
         form.submit();
     }
+
 </script>
 @endsection
+
+  </script>
+@endsection
+
