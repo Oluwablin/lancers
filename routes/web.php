@@ -33,7 +33,7 @@ Route::get('/', function () {
 
 Route::get('/pricing', "SubscriptionController@showSubscriptions")->name('subscriptions'); //THIS IS THE CORRECT ROUTE
 
-//Email subscription    
+//Email subscription
 Route::post('/submailinglist', 'MailSubscriptionController@mailStore');
 
 
@@ -53,7 +53,14 @@ Route::post('/guest/save/step3', 'GuestController@savestep3')->middleware('guest
 Route::get('/guest/create/step4', 'GuestController@createstep4')->middleware('guest');
 Route::post('/guest/save/step4', 'GuestController@savestep4')->middleware('guest');
 
+/* Track Project */
+Route::get('/guest/track/', 'ProjectController@acceptproject');
+Route::post('/guest/track/project', 'ProjectController@selectproject');
+Route::get('/guest/track/{trackCode}', 'ProjectController@showproject');
 
+//Doc view pdf
+Route::get('/guest/track/{trackCode}/dynamic_pdf','ProjectController@dynamicPDF');
+//Route::get('/guest/track/{id}/dynamic_pdf','DynamicPDFController@index')->middleware('guest');
 
 
 
@@ -145,13 +152,23 @@ Route::group(['middleware' => 'auth:web'], function() {
     Route::get('/projects', 'ProjectController@listGet');
     Route::get('/project/status', 'ProjectController@listGet');
     Route::get('/project/track', function(){ return view('trackproject'); });
-    
+    Route::get('/edit-project/{id}', 'ProjectController@edit');
+    Route::post('/edit-project-save/{id}', 'ProjectController@update');
+    Route::get('/view-project/{id}', 'ProjectController@view');
+    Route::post('/completed-project/{id}', 'ProjectController@complete');
+    Route::post('/pending-project/{id}', 'ProjectController@pending');
+     Route::post('/delete-project/{id}', 'ProjectController@delete');
     // Task Routes
     Route::get('/project/tasks', 'TaskController@getAllTasks');
     Route::post('/project/task/create', 'TaskController@store');
 
     Route::get('/project/collaborators', 'CollaboratorController@getAllCollaborators');
     Route::post('/project/collaborator/create', 'CollaboratorController@store');
+    //Crud for Collaborator
+    Route::get('/project/collaborator/remove/{id}', 'CollaboratorController@delete');
+    Route::get('/project/collaborator/edit/{id}', 'CollaboratorController@edit');
+    Route::post('/project/collaborator/update/{id}', 'CollaboratorController@update');
+    Route::get('/project/collaborator/view/{id}', 'CollaboratorController@view');
 
 
     // Client Routes
@@ -164,9 +181,9 @@ Route::group(['middleware' => 'auth:web'], function() {
 
 
     Route::get('/clients/{client}/invoices/{invoice}', 'InvoiceController@clientInvoice');
-    // Route::get('/client/add', function() {
-    //     return view('addclients');
-    // });
+    Route::get('/client/add', function() {
+         return view('addclients');
+    });
 
 
     //Invoice routes
@@ -195,6 +212,13 @@ Route::group(['middleware' => 'auth:web'], function() {
     Route::get('client-send-invoice', function () {
         return view('client-send-invoice');
     });
+    Route::get('invoice/remove/{id}', 'InvoiceController@delete');
+    Route::get('invoice/edit/{id}', 'InvoiceController@edit');
+    Route::post('invoice/update/{id}', 'InvoiceController@update');
+    Route::get('user/{id}', function ($id) {
+        return 'User ' . $id;
+    });
+
 
     // Estimate Routes
     Route::get('/estimates', 'EstimateController@index')->middleware('auth');
@@ -276,6 +300,21 @@ Route::group(['middleware' => 'auth:web'], function() {
     Route::get('/invoice/review', function() {
         return view('reviewinvoice');
     });
+
+    Route::get('/invoice', function () {
+        return view('invoice_view');
+    });
+    Route::get('/invoice_sent', function () {
+        return view('invoice_sent');
+    });
+    Route::get('/invoice-view', function () {
+        return view('invoice-view');
+    });
+    Route::get('/client-doc-view', function () {
+        return view('client-doc-view');
+    });
+    
+    
     // Route::get('/invoice', function () {
     //     return view('invoice_view');
     // });
@@ -288,6 +327,7 @@ Route::group(['middleware' => 'auth:web'], function() {
     // Route::get('/client-doc-view', function () {
     //     return view('client-doc-view');
     // });
+
 
 
     //Proposals
@@ -316,6 +356,14 @@ Route::group(['middleware' => 'auth:web'], function() {
         return view('client-nav-bar');
     });
 });
+
+//Invite new user to collaborate
+Route::get('invite', 'ProjectController@invite')->name('invite');
+//Process the form submission
+Route::post('invite', 'InviteController@process')->name('process');
+// Accept the invitation. {token} is a required parameter that will be exposed to us in the controller method
+Route::get('accept/{token}', 'InviteController@accept')->name('accept');
+
 
 Route::get('/run/{command}', function ($command) {
     $test = \Artisan::call($command);

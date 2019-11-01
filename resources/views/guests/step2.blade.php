@@ -349,20 +349,20 @@
 
     <header style="border-bottom: 2px solid rgb(223, 223, 223);">
         <nav style="display: flex; ">
-            <a href="#"  @click.prevent="$router.push('/estimate')" class="column-1">
+            <a href="#"  @click.prevent="$router.push('/estimate')" id="closeForm" class="column-1">
                 <img
                     src="https://res.cloudinary.com/mide358/image/upload/v1570621469/clear_24px_rasbwc.png"
                     alt="navIcon"
                     />
             </a>
-            <a href="#" @click.prevent="previous" class="column-1">
+            <a href="{{ redirect()->getUrlGenerator()->previous() }}" @click.prevent="previous" class="column-1">
                 <img
                     src="https://res.cloudinary.com/mide358/image/upload/c_scale,h_27,w_13/v1570621434/Vector_ag4hnv.png"
                     alt="navIcon"
                     />
             </a>
             <div class="column-2">Create Estimate</div>
-            <a href="#" @click.prevent="next" id="upperNext" class="column-3 float-right" style="border: 1px solid gray;
+            <a href="#" @click.prevent="next" id="step2UpperButton" class="column-3 float-right" style="border: 1px solid gray;
                background: #0ABAB5 !important;">NEXT</a>
         </nav>
     </header>
@@ -438,19 +438,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label for="cc-exp" class="control-label">How much  do you charge per hour?</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control col-md-4 col-sm-10" required name="cost_per_hour" placeholder="NGN 0.00" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <br/>
+                                
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
@@ -561,7 +549,7 @@
                     <br/>
                     <div>
                         <div class="text-center">
-                        <button  type="submit" class="btn" style="border: 1px solid gray;
+                        <button  type="submit" class="btn" id="step2LowerButton" style="border: 1px solid gray;
                                  background: #0ABAB5 !important; height: 70px; width: 200px;color:#fff!important">NEXT
 
                         </button>
@@ -577,5 +565,40 @@
         @endsection
 
         @section('script')
+
+<script>
+//use jquery to handle next buttons
+        $("#step2UpperButton").on("click", function() {
+        $("#step2LowerButton").trigger("click");
+      });
+
+      $("#moveBack").on("click", function() {
+    window.history.back();
+
+    });
+
+//handle form close
+$("#closeForm").on("click", function() {
+    let path = "@php echo session("path") @endphp";
+    window.location = path;
+
+});
+
+
+
+    let createProject = document.getElementById('createProject');
+
+
+     function manage(createProject) {
+        let bt = document.getElementById('btne');
+        if (createProject.value != '') {
+            bt.disabled = false;
+        }
+        else {
+            bt.disabled = true;
+             bt.preventDefault();
+        }
+    }
+    </script>
 
         @endsection
