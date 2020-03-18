@@ -431,7 +431,7 @@
 <section class="invoice-body m-auto">
     <div class="container">
         <div class="mt-5 px-3">
-            <form method="POST" action="/invoice/send" style="display: inline-block;">
+            <form method="POST" action="/invoices/send" style="display: inline-block;">
                 @csrf
                 <input type="text" style="display: none;" name="invoice" value="{{$invoice->invoice->id}}">
                 <button type="submit" class="btn btn-outline-dark ">Send Invoice</button>
@@ -459,7 +459,7 @@
                 </div>
 
                 <div class="col-6">
-                    <img src="/storage/logos/{{$invoice->logo}}"
+                    <img src="https://res.cloudinary.com/samtech/image/upload/v1570725037/My_Logo_-_Black.png"
                         class="img-fluid logo-img">
                 </div>
             </div>

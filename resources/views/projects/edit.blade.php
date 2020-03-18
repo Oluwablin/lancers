@@ -9,9 +9,8 @@
         width: calc(100% + 40px);
         border: 1px solid #ddd;
     }
-
     .hiddeinput {
-        color: grey !important;
+        color: grey!important;
         background: linear-gradient(to right, #808080, #808080) 5px calc(100% - 5px)/calc(100% - 10px) 2px no-repeat;
         /* <5px calc(100% - 5px)> : position of the gradient [5px from left and 5px from bottom  */
         /* <calc(100% - 10px) 2px> : size of the gradient [width:100%-10px height:2px] */
@@ -19,20 +18,18 @@
         border: hidden;
         padding: 3px;
     }
-
     .icon {
-        color: grey !important;
+        color: grey!important;
         padding: 3px;
     }
-
     .hiddeselect {
-        color: #000 !important;
+        color: #000!important;
         background: linear-gradient(to right, #000, #000) 5px calc(100% - 5px)/calc(100% - 10px) 2px no-repeat !important;
         /* <5px calc(100% - 5px)> : position of the gradient [5px from left and 5px from bottom  */
         /* <calc(100% - 10px) 2px> : size of the gradient [width:100%-10px height:2px] */
-        background-color: #fcfcfc !important;
-        border: hidden !important;
-        padding: 3px !important;
+        background-color: #fcfcfc!important;
+        border: hidden!important;
+        padding: 3px!important;
     }
 </style>
 @endsection
@@ -50,14 +47,14 @@
             <div class="container ">
                 <div class="row">
                     <div class="col-12 col-sm-12 col-md-12  offset-md-2">
-                        <div class="card">
+                        <div  class="card">
                             <div class="card-body">
                                 <div class="card-title">
                                     <h2 class="pull-left">{{$projects->title}}</h2>
                                 </div>
                                 <hr>
                                 <div class="clearrfix"></div>
-                                <br />
+                                <br/>
 
                                 <hr class="my-hr-line">
                                 @foreach($projects->user->estimate as $esti)
@@ -66,9 +63,7 @@
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="form-group">
-                                                <label>
-                                                    <h3>Project Name</h3>
-                                                </label>
+                                                <label>  <h3>Project Name</h3></label>
                                             </div>
                                         </div>
 
@@ -81,9 +76,7 @@
 
                                     <hr class="my-hr-line">
                                     <div class="">
-                                        <label>
-                                            <h3>Billing</h3>
-                                        </label>
+                                        <label>  <h3>Billing</h3></label>
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
@@ -93,13 +86,13 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group">
-                                                <input type="number" min="0" class="form-control col-md-4 col-sm-10" required name="time" value="{{$esti->time}}" placeholder="Hours" />
+                                                <input type="number" class="form-control col-md-4 col-sm-10" required name="time" value="{{$esti->time}}" placeholder="Hours" />
                                             </div>
                                         </div>
                                     </div>
 
 
-                                    <br />
+                                    <br/>
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="form-group">
@@ -111,16 +104,14 @@
                                                 <i class="icon fa fa-calendar"></i>&nbsp;
                                                 <input class="hiddeinput col-md-4 col-sm-3" type="text" required onfocus="(this.type = 'date'); (this.name = 'start')" name="start" value="{{$esti->start}}" placeholder=" Set start date" />
                                                 &nbsp; <i class="icon fa fa-calendar"></i>&nbsp;
-                                                <input type="text" class="hiddeinput col-md-4 col-sm-3" required onfocus="(this.type = 'date'); (this.name = 'end')" name="end" value="{{$esti->end}}" placeholder="Set end date" />
+                                                <input type="text" class="hiddeinput col-md-4 col-sm-3"  required onfocus="(this.type = 'date'); (this.name = 'end')" name="end" value="{{$esti->end}}" placeholder="Set end date" />
                                             </div>
                                         </div>
                                     </div>
 
                                     <hr class="my-hr-line">
                                     <div class="">
-                                        <label>
-                                            <h3>Expenses</h3>
-                                        </label>
+                                        <label>  <h3>Expenses</h3></label>
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
@@ -130,7 +121,7 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group">
-                                                <input type="number" min="0" class="form-control col-md-4 col-sm-10" required name="equipment_cost" value="{{$esti->equipment_cost}}" id="est1" placeholder="NGN 0.00" />
+                                                <input type="number" class="form-control col-md-4 col-sm-10" required name="equipment_cost"  value="{{$esti->equipment_cost}}" id="est1" placeholder="NGN 0.00" />
                                             </div>
                                         </div>
                                     </div>
@@ -143,7 +134,7 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group">
-                                                <input type="text" class="form-control col-md-6 col-sm-10" required name="sub_contractors" value="{{$esti->sub_contractors}}" id="est2" placeholder="E.g. Illustrator, Consulting..." />
+                                                <input type="text"  class="form-control col-md-6 col-sm-10" required name="sub_contractors" value="{{$esti->sub_contractors}}" id="est2" placeholder="E.g. Illustrator, Consulting..." />
                                             </div>
                                         </div>
                                     </div>
@@ -156,16 +147,14 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group">
-                                                <input type="number" min="0" class="form-control col-md-4 col-sm-10" required name="sub_contractors_cost" value="{{$esti->sub_contractors_cost}}" id="est3" placeholder="NGN 0.00" />
+                                                <input type="number" class="form-control col-md-4 col-sm-10" required name="sub_contractors_cost" value="{{$esti->sub_contractors_cost}}" id="est3" placeholder="NGN 0.00" />
                                             </div>
                                         </div>
                                     </div>
 
 
                                     <div class="">
-                                        <label>
-                                            <h3>Expertise</h3>
-                                        </label>
+                                        <label>  <h3>Expertise</h3></label>
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
@@ -175,7 +164,7 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group">
-                                                <input type="number" min="0" max="10" maxlength="2" class="form-control col-md-4 col-sm-10" required name="similar_projects" value="{{$esti->similar_projects}}" id="exp1">
+                                                <input type="number" class="form-control col-md-4 col-sm-10" required name="similar_projects" value="{{$esti->similar_projects}}" id="exp1">
                                             </div>
                                         </div>
                                     </div>
@@ -188,14 +177,13 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group">
-                                                <input class="form-control col-md-6 col-sm-10" type="number" min="0" max="5" maxlength="1" required name="rating" value="{{$esti->rating}}" id="exp2"> /5
+                                                <input class="form-control col-md-6 col-sm-10" type="number" required name="rating" value="{{$esti->rating}}" id="exp2"> /5
                                             </div>
                                         </div>
                                     </div>
                                     <hr class="my-hr-line">
                                     <div class="">
-                                        <label>
-                                            <h3>Currency:
+                                        <label>  <h3>Currency:
 
                                                 <select class="hiddeselect" name="currency_id" required>
                                                     <option value="">Select Currency</option>
@@ -204,17 +192,14 @@
                                                     @endforeach
                                                 </select>
 
-                                            </h3>
-                                        </label>
+                                            </h3></label>
                                     </div>
 
                                     <hr class="my-hr-line">
-                                    <div class="row">
+                                      <div class="row">
                                         <div class="col-6">
                                             <div class="form-group">
-                                                <label>
-                                                    <h3>Client Name</h3>
-                                                </label>
+                                                <label>  <h3>Client Name</h3></label>
                                             </div>
                                         </div>
 
@@ -231,21 +216,21 @@
                                             </div>
                                         </div>
                                     </div>
-
-
+                                
+                                    
 
                             </div>
                         </div>
                         <div class="clearfix"></div>
-                        <br />
+                        <br/>
                         <div>
                             <div class="text-center">
-                                <button type="submit" class="btn" style="border: 1px solid gray;
+                                <button  type="submit" class="btn" style="border: 1px solid gray;
                                          background: #0ABAB5 !important; height: 50px; width: 150px;color:#fff!important">Save
 
                                 </button>
                             </div>
-                            <br /> <br />
+                            <br/>  <br/>
                         </div>
                         </form>
                         @endforeach
@@ -262,15 +247,15 @@
 
 @section('others')
 <button class="btn btn-secondary text-white rounded-circle" id="add-something">
-    <a href="{{url('estimate/create/step1')}}"> <i class="fas fa-plus"></i> </a>
+    <a href="{{url('estimate/create/step1')}}">    <i class="fas fa-plus"></i> </a>
 </button>
 @endsection
 
 @section('script')
-
+ 
 <script>
     let selectStatus = document.querySelector('#select-filter');
-    selectStatus.addEventListener('change', function() {
+    selectStatus.addEventListener('change', function () {
         // this.form.action = "/projects?status="+selectStatus.value;
         // this.form.submit();
         if (selectStatus.value == 'all')

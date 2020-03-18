@@ -374,7 +374,7 @@
 <div class="container">
     
     <div id="glac">
-      Lancers<hr />
+      Glacier Fintech App<hr />
     </div>
     <hr />
     <div id="bill">

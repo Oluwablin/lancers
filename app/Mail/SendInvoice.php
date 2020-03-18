@@ -30,9 +30,7 @@ class SendInvoice extends Mailable
      */
     public function build()
     {
-        // return $this->subject("Invoice from ".$this->data['user']." on lancers")
-        //     ->markdown('emails.sendinvoice');
         return $this->subject("Invoice from ".$this->data['user']." on lancers")
-        ->view('emails.sendinvoiceview');
+            ->markdown('emails.sendinvoice');
     }
 }

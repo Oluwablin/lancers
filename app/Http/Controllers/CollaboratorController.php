@@ -7,8 +7,6 @@ use App\Collaborator;
 use Auth;
 use App\User;
 use App\Project;
-use App\Notifications\UserNotification;
-
 
 class CollaboratorController extends Controller
 {
@@ -41,7 +39,6 @@ class CollaboratorController extends Controller
 
         if ($query) {
             // $request->session()->flash('success', 'Collaborator Added!');
-
             return back()->withSuccess('Collaborator Added Successful');
         }else{
             // $request->session()->flash('errors', 'Collaborator addtion failed!');
