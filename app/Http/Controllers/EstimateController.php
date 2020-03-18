@@ -17,6 +17,7 @@ use App\Http\Resources\Estimate as EstimateResource;
 use App\Http\Resources\EstimateCollection;
 use Illuminate\Support\Facades\Auth;
 
+
 class EstimateController extends Controller {
 
     public function step1(Request $request) {
@@ -29,7 +30,7 @@ class EstimateController extends Controller {
         $currencies = Currency::all('id', 'code');
 
         if ($request->old_project && $request->new_project)
-            $project = ['type' => 'new', 'project' => $request->new_project];
+            return back()->with('error', 'Please specify either an old or new project');
         elseif ($request->old_project)
             $project = ['type' => 'old', 'project' => $request->old_project];
         elseif ($request->new_project)
@@ -45,15 +46,56 @@ class EstimateController extends Controller {
     }
 
     public function step3(Request $request) {
-        $estimate = $request->all();
+
+        //Check if 'sub_contractors' or 'sub_contractors_cost' input field is filled
+        $sub_contractors_flag = isset($request->sub_contractors) || !empty($request->sub_contractors);
+        $sub_contractors_cost_flag = isset($request->sub_contractors_cost) || !empty($request->sub_contractors_cost);
+
+        if(($request->time >= 0) && ($request->price_per_hour >= 0) && ($request->equipment_cost >= 0) && ($request->sub_contractors_cost >= 0) && ($request->similar_projects >= 0) && (($request->rating >= 0) && ($request->rating <= 5)) && (!$sub_contractors_flag == !$sub_contractors_cost_flag)  )
+        {
+        $estimate = $request->except(['next_btn', 'next_page']);
+
+        // $estimate = $request->all();
         $clients = Client::where('user_id', Auth::user()->id)->select('id', 'name')->get();
         session(['estimate' => $estimate]);
 
         return view('estimate.step3')->withClients($clients);
+        }
+        else
+        {   $currencies = Currency::all('id', 'code');
+            $project = session('project')['project'];
+            $errorArray = [];
+
+                if($request->time < 0) $errorArray[] = "Duration for project completion cannot be a negative value";
+
+                if($request->price_per_hour < 0) $errorArray[] = "Amount collected per hour cannot be a negative value";
+
+                if($request->equipment_cost < 0) $errorArray[] = "Equipment cost cannot be a negative value";
+
+                //Check and generate error messages if either but not both 'sub_contractors' and 'sub_contractors_cost' fields are empty
+                $sub_contractors_flag = isset($request->sub_contractors) || !empty($request->sub_contractors);
+                $sub_contractors_cost_flag = isset($request->sub_contractors_cost) || !empty($request->sub_contractors_cost);
+                if( !$sub_contractors_flag != !$sub_contractors_cost_flag) {
+                    if($sub_contactors_flag) $errorArray += "Enter subcontractor cost";
+                    if($sub_contactors_cost_flag) $errorArray += "Enter subcontractor name";
+                }
+
+                if($request->sub_contractors_cost < 0) $errorArray[] = "Number of sub contractors value cannot be a negative value";
+
+                if($request->similar_projects < 0) $errorArray[] = "Similar projects value cannot be a negative value";
+
+                if(($request->rating < 0)  && ($request->rating > 5)) $errorArray[] = "The rating for your experience level must be greater than -1 and less than or equal to 5";
+
+               // default: $errorArray[] = "All numeric inputs must be greater than zero and rating must not be greater than 5";
+
+
+            return view('estimate.step2')->with(['errors' => $errorArray, 'project' => $project, 'currencies' => $currencies]);
+            //return redirect('/estimate/create/step2')->withProject($project['project'])->withCurrencies($currencies);
+        }
     }
 
     public function step4(Request $request) {
-      
+        // dd(session()->all());
         $data['countries'] = Country::all('id', 'name');
         $data['states'] = State::all();
         $client = Client::whereId($request->client)->first();
@@ -67,11 +109,11 @@ class EstimateController extends Controller {
             $data['currency'] = Currency::find(session('estimate')['currency_id'])->code;
             $data['currency_symbol'] = Currency::find(session('estimate')['currency_id'])->symbol;
             $data['lancer_name'] = Auth::user()->name;
-            $data['workmanship'] = session('estimate')['price_per_hour'] * session('estimate')['time'];
+            $data['workmanship'] = (session('estimate')['price_per_hour'] ?? 2000) * session('estimate')['time'];
             $data['equipment_cost'] = session('estimate')['equipment_cost'];
             $data['sub_contractors_cost'] = session('estimate')['sub_contractors_cost'];
             $data['total'] = $data['workmanship'] + $data['equipment_cost'] + $data['sub_contractors_cost'];
-			
+
             $estimate = Estimate::create(array_merge(session('estimate'), ['estimate' => $data['total'], 'user_id' => Auth::user()->id]));
 			//dd($estimate->id);
             $project = Project::create([
@@ -85,7 +127,13 @@ class EstimateController extends Controller {
                         'status' => 'pending'
             ]);
             $project->save();
-            return view('addclients')->with('estimate', $estimate->id);
+
+            // $request->session()->flush();
+
+            $request->session()->put('new_estimate_id', $estimate->id);
+            session(["projectObject" => $project]);
+            return redirect('invoice/review');
+            // return view('addclients')->with('estimate', $estimate->id);
         }
         return view('estimate.step4',$data);
     }
@@ -102,7 +150,7 @@ class EstimateController extends Controller {
             $contacts = $contacts;
         }
         if(empty($contacts[0]['email'])){
-           session()->flash('message.alert', 'danger');
+            session()->flash('message.alert', 'danger');
             session()->flash('message.content', "Client Contact Email Can Not Be Empty.. Please Check Contact Information");
             return back();
         }
@@ -114,13 +162,13 @@ class EstimateController extends Controller {
         try {
             // $client = new Client;
             // $estimate = new Estimate;
-        if(!empty($contacts[0]['email'])){
-            $emailcontact = $contacts[0]['email'];
-        }
-        else{
-            $emailcontact = null;
-        }
-        
+            if(!empty($contacts[0]['email'])){
+                $emailcontact = $contacts[0]['email'];
+            }
+            else{
+                $emailcontact = null;
+            }
+
 
             $data['project'] = session('project')['project'];
             $data['company'] = session('client')['name'];
@@ -135,6 +183,7 @@ class EstimateController extends Controller {
             $data['equipment_cost'] = session('estimate')['equipment_cost'];
             $data['sub_contractors_cost'] = session('estimate')['sub_contractors_cost'];
             $data['total'] = $data['workmanship'] + $data['equipment_cost'] + $data['sub_contractors_cost'];
+
             $clients = new Client;
             $clients->user_id = Auth::user()->id;
             $clients->name = session('client')['name'];
@@ -150,7 +199,7 @@ class EstimateController extends Controller {
 
             // Estimate ID set to 1 because an estimate must not have a project
             $estimate = Estimate::create(array_merge(session('estimate'), ['estimate' => $data['total'], 'user_id' => Auth::user()->id]));
-			
+
             $project = Project::create([
                         'title' => $data['project'],
                         'user_id' => Auth::user()->id,
@@ -176,9 +225,12 @@ class EstimateController extends Controller {
             // $data['invoice_no'] = $invoice->id;
             // $invoice->save();
             DB::commit();
-            // dd(session()->all());
-            return view('addclients')
-                            ->with('estimate', $estimate->id);
+
+            // $request->session()->flush();
+            $request->session()->put('new_estimate_id', $estimate->id);
+            session(["projectObject" => $project]);
+            return redirect('invoice/review');
+
         } catch (\Throwable $e) {
             return back()->with('error', $e->getMessage());
             DB::rollback();

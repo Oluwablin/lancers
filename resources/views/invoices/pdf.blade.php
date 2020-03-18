@@ -1,4 +1,4 @@
-@extends('layouts.master')  
+@extends('layouts.master')
 
 @section('styles')
 <style>
@@ -230,7 +230,7 @@ svg {
     color: #fff;
     background-color: #0ABAB5;
 }
-@media (max-width: 992px) {    
+@media (max-width: 992px) {
 #sidebar-wrapper {
   height: 80vw;
 }
@@ -440,7 +440,7 @@ tbody, .bold {
 @media (max-width: 450px) {
     #sidebar-wrapper {
         display: none;
-    }    
+    }
       td,
     th {
         width: 38vw;
@@ -470,8 +470,16 @@ tbody, .bold {
                 </div>
 
                 <div class="col-6">
-                    <img src="https://res.cloudinary.com/samtech/image/upload/v1570725037/My_Logo_-_Black.png"
-                        class="img-fluid logo-img">
+
+                    {{-- <img src="/storage/logos/{{$invoice->logo}}" --}}
+                    @if(null == $invoice->client->profile_picture)
+                    <img src="https://res.cloudinary.com/samtech/image/upload/v1570725037/My_Logo_-_Black.png" class="img-fluid logo-img">
+                    @endif
+                    @if(null != $invoice->client->profile_picture)
+                    <img id="image_selecter" src="{{ asset($invoice->client->profile_picture) }}" style="width: 30px; height: 30px; border-radius: 10%; pointer: finger;" alt="Profile Image">
+
+
+                    @endif
                 </div>
             </div>
             <table class="table-responsive" style="width: 100%">
@@ -485,7 +493,7 @@ tbody, .bold {
                 <tbody>
                     <tr>
                         <td><span >{{$invoice->client->name}}</span> </td>
-                        <td><span >{{dateSlash($invoice->invoice->issue_date ?? $invoice->invoice->created_at)}}</span></td>
+                        <td><span >{{$invoice->invoice->issue_date}}</span></td>
                         <td> N/A</td>
                     </tr>
                     <tr>
@@ -494,7 +502,7 @@ tbody, .bold {
                         <td></td>
                     </tr>
                     <tr>
-                        <td><span >{{getState($invoice->client->state_id)}}, {{getCountry($invoice->client->country_id)}}</span> </td>
+
                         <th class="table-date"> Due Date</th>
                         <th class="table-date"> Amount Due</th>
                     </tr>

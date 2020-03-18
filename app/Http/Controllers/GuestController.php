@@ -31,6 +31,7 @@ class GuestController extends Controller {
 
     // public $project;
 
+
     public function step1(Request $request) {
         $project = $request->session()->get('project');
         session(["path" => url('/')]);
@@ -82,6 +83,7 @@ class GuestController extends Controller {
 
         if ($data) {
             $project = Session::get('project');
+            // dd($project);
             $request->session()->put('project', $project);
             return view('guests/step2')->with(['project' => $project, 'currencies' => $currencies]);
         }
@@ -91,25 +93,15 @@ class GuestController extends Controller {
 
     public function savestep2(Request $request) {
 
+        //Check if 'sub_contractors' or 'sub_contractors_cost' input field is filled
+        $sub_contractors_flag = isset($request->sub_contractors) || !empty($request->sub_contractors);
+        $sub_contractors_cost_flag = isset($request->sub_contractors_cost) || !empty($request->sub_contractors_cost);
+
+        if(($request->time >= 0) && ($request->cost_per_hour >= 0) && ($request->equipment_cost >= 0) && ($request->sub_contractors_cost >= 0) && ($request->similar_projects >= 0) && (($request->rating >= 0) && ($request->rating <= 5)) && (!$sub_contractors_flag == !$sub_contractors_cost_flag) )
+        {
         $project = Session::get('project');
         $request->session()->put('project', $project);
 
-        // $validator = Validator::make($request->all(), [
-        //     // 'project_id' => 'required|numeric',
-        //     'time' => 'required|numeric',
-        //     'price_per_hour' => 'required|numeric',
-        //     'equipment_cost' => 'nullable|numeric',
-        //     'sub_contractors' => 'nullable|string',
-        //     'sub_contractors_cost' => 'nullable|numeric',
-        //     'similar_projects' => 'required|numeric',
-        //     'rating' => 'required|numeric',
-        //     'currency_id' => 'required',
-        //     'start' => 'required|date',
-        //     'end' => 'required|date'
-        // ]);
-        // if ($validator->fails()) {
-        //     return back()->withErrors($validator)->withInput();
-        // } else {
         $data = [
             'time' => $request->time,
             'price_per_hour' => $request->cost_per_hour,
@@ -123,14 +115,44 @@ class GuestController extends Controller {
             'end' => $request->end
         ];
 
-
         $request->session()->put('guestestmate', $data);
 
 
         // $ddata = Session::all();
         //  dd($data);
         return redirect('guest/create/step3');
-        // }
+        }
+        else
+        {   $currencies = Currency::all('id', 'code');
+            $project = session('project');
+
+            $errorArray = [];
+
+                if($request->time < 0) $errorArray[] = "Duration for project completion cannot be a negative value";
+
+                if($request->cost_per_hour < 0) $errorArray[] = "Amount collected per hour cannot be a negative value";
+
+                if($request->equipment_cost < 0) $errorArray[] = "Equipment cost cannot be a negative value";
+
+                if($request->sub_contractors_cost < 0) $errorArray[] = "Number of sub contractors value cannot be a negative value";
+
+                //Check and generate error messages if either but not both 'sub_contractors' and 'sub_contractors_cost' fields are empty
+                $sub_contractors_flag = isset($request->sub_contractors) || !empty($request->sub_contractors);
+                $sub_contractors_cost_flag = isset($request->sub_contractors_cost) || !empty($request->sub_contractors_cost);
+                if( !$sub_contractors_flag != !$sub_contractors_cost_flag) {
+                    if($sub_contactors_flag) $errorArray += "Enter subcontractor cost";
+                    if($sub_contactors_cost_flag) $errorArray += "Enter subcontractor name";
+                }
+                
+                if($request->similar_projects < 0) $errorArray[] = "Similar projects value cannot be a negative value";
+
+                if(($request->rating < 0)  && ($request->rating > 5)) $errorArray[] = "The rating for your experience level must be greater than -1 and less than or equal to 5";
+
+               // default: $errorArray[] = "All numeric inputs must be greater than zero and rating must not be greater than 5";
+
+            return view('guests/step2')->with(['errors' => $errorArray, 'project' => $project, 'currencies' => $currencies]);
+            //return redirect('/estimate/create/step2')->withProject($project['project'])->withCurrencies($currencies);
+        }
     }
 
     public function createstep3(Request $request) {
@@ -154,19 +176,31 @@ class GuestController extends Controller {
         $contacts = [];
         if ($request->contact) {
             foreach ($request->contact as $contact) {
-                array_push($contacts, ["name" => $contact["'name'"], "email" => $contact["'email'"]]);
+
+                $contacts[] = ["name" => $contact["'name'"], "email" => $contact["'email'"]];
+
             }
-            $contacts = $contact;
+            //the bug was from this line, casting $contacts = $contact; would use the value of $contact from the foreach loop
+            //$contacts = $contact;
         }
+
+
         if (empty($contact["'email'"])) {
             session()->flash('message.alert', 'danger');
             session()->flash('message.content', "Client Contact Email Can Not Be Empty.. Please Check Contact Information");
             return back();
         }
 
+        if(count($contacts) > 0){
+            $emailcontact = $contacts[0]['email'];
+        }
+        else{
+            $emailcontact = null;
+        }
+
         $data = [
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $emailcontact,
             'street' => $request->street,
             'street_number' => $request->street_number,
             'city' => $request->city,
@@ -192,6 +226,7 @@ class GuestController extends Controller {
     }
 
     public function savestep4(Request $request) {
+        // Called on submission of registeration
         $data = [];
         $session_project = $request->session()->get('project');
 
@@ -227,11 +262,10 @@ class GuestController extends Controller {
         ]);
         Auth::login($user);
 
-
         $clients = new Client;
         $clients->user_id = $user->id;
         $clients->name = session('client')['name'];
-        $clients->email = $emailcontact;
+        $clients->email = session('client')['email'];
         $clients->street = session('client')['street'];
         $clients->street_number = session('client')['street_number'];
         $clients->city = session('client')['city'];
@@ -255,9 +289,12 @@ class GuestController extends Controller {
         ]);
         $project->save();
 
+        $request->session()->flush();
+        $request->session()->put('new_estimate_id', $estimate->id);
+        session(["projectObject" => $project]);
+        return redirect('invoice/review');
 
-
-        return view('addclients')->with('estimate', $estimate->id);
+        // return view('addclients')->with('estimate', $estimate->id);
     }
 
 }

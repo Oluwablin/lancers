@@ -12,7 +12,7 @@
             <div class="">
                 <form class="form-inline" style="display: inline-block; margin-top: 10px;">
                     <select  class="form-control" id="select-filter">
-                        
+
                         <option value="all" @if (Request()->filter) {{ 'selected' }} @endif >All</option>
                         <option value="pending" @if (Request()->filter && Request()->filter == 'pending') {{ 'selected' }} @endif>Pending</option>
                         <option value="completed" @if (Request()->filter && Request()->filter == 'completed') {{ 'selected' }} @endif>Completed</option>
@@ -21,6 +21,8 @@
                 &nbsp;  <a href="{{url('clients/add')}}">    <button class='create-invoice' style="height:40px!important;border-radius: 4px 4px "> <span class="fa fa-plus"> </span> Add New Client</button> </a>
 
             </div>
+                        @if(session('success'))<br> <h6><span class="alert alert-success">{{session('success')}}</span></h6>
+            @elseif(session('error'))<br> <h6><span class="alert alert-danger">{{session('error')}}</span></h6> @endif
             <div class="table-responsive">
                 <table class="table project-table table-borderless">
                     <thead>
@@ -38,7 +40,7 @@
                             <td scope="row" class="rounded-left border border-right-0">
                                 <span class="text-small text-muted mr-2">
                                     <i class="fas fa-circle"></i>
-                                </span> 
+                                </span>
                                 <span class="">{{date('d/m/Y', strtotime($client->created_at))}}</span>
                             </td>
                             <td class="border-top border-bottom titles text-center">
@@ -75,12 +77,16 @@
                                         <i class="fas fa-ellipsis-v"></i>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                        <a class="dropdown-item text-success" href="#"><i class="fas fa-binoculars"></i> View</a>
-                                        <a class="dropdown-item text-secondary" href="#"><i class="fas fa-edit"></i> Edit</a>
-                                        <a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt"></i> Delete</a>
+                                        <a class="dropdown-item text-success" href="/clients/view/{{$client->id}}"><i class="fas fa-binoculars"></i> View</a>
+                                        <a class="dropdown-item text-secondary" href="/clients/{{$client->id}}/edit"><i class="fas fa-edit"></i> Edit</a>
+                                            <a href="" data-id="{{$client->id}}" class="dropdown-item text-danger delete-btn"><i class="fas fa-trash-alt"></i> Delete</a>
                                     </div>
                                 </div>
                             </td>
+                            <form action="/clients/{{$client->id}}/delete" method="post" id="delete-{{$client->id}}">
+                                @csrf
+                                @method('delete')
+                            </form>
                         </tr>
 
 
@@ -96,14 +102,47 @@
 
 
 @section('others')
-<button class="btn btn-secondary text-white rounded-circle" id="add-something">
+<button class="btn btn-secondary text-white rounded-circle" id="add-something" onclick="location.href='{{url('/clients/add')}}'">
     <i class="fas fa-plus"></i>
 </button>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="myModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmMessage"> </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                <a href="" id="delLink"><button class="btn btn-primary modal-save">YES I DO</button></a>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                <button class="btn btn-primary modal-close" data-dismiss="modal">NO I DO NOT</button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+            </div>
+          </div>
+          </div>
 @endsection
 
 @section('scripting')
 <script>
-    alert(11);
+    //alert(11);
     let select = document.querySelector('#select_status');
     console.log(select);
     select.addEventListener('change', function () {
@@ -120,5 +159,44 @@
             if(selectStatus.value == 'all') window.location.href="/clients";
             else window.location.href="/clients?filter="+selectStatus.value;
         }, false)
-    </script>
+
+
+
+        $(".delete-btn").on('click', e => {
+            e.preventDefault();
+
+            let id = e.target.dataset.id;
+
+            //get client details from app
+            $.get(
+                `/clients/details/json/${id}`,
+                function(data,status)
+                {
+                const url = "{{ url('/')}}/clients/";
+                let urlLink = url+id+"/delete";
+                //use spread operator to convert response array to object
+                let clientObject = JSON.parse(JSON.stringify(...data));
+                $("#delLink").attr("href", urlLink);
+                $("#confirmMessage").html(`Do you want to delete client with name ${clientObject.name.toUpperCase()} and email ${clientObject.email}`);
+                //fire confirmation dialogue
+                $("#myModal").modal();
+
+           /*     var confirmation = confirm(`Do you want to delete client with name ${clientObject.name.toUpperCase()} and email ${clientObject.email}`);
+              //run switch statement after dialogue
+            switch(true){
+                case confirmation == true: $(`#delete-${id}`).submit();
+                break;
+                case confirmation == false: alert("Client delete aborted");
+                break;
+                default: alert("Please select Ok or Cancel to proceed with Client delete");
+                break;
+            }
+            */
+
+                }
+            );
+
+        });
+
+            </script>
 @endsection

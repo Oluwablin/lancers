@@ -392,29 +392,35 @@ table.project-table thead tr th {
 
         </div>
         <ul class="list-unstyled components">
-            <li class=" @if(request()->path() == 'dashboard') active @endif">
+            <li class=" @if( preg_match("/^dashboard.*$/", request()->path()) ) active @endif">
                 <a href="{{url('dashboard')}}">
                     <img src="https://lancer-app.000webhostapp.com/images/svg/home.svg" height="20" width="auto"> <span> Dashboard</span></a>
             </li>
-            <li class=" @if(request()->path() == 'client') active @endif">
+            <li class=" @if( preg_match("/^client.*$/", request()->path()) ) active @endif">
                 <a href="{{url('clients')}}">
-                    <img src="https://lancer-app.000webhostapp.com/images/svg/customer.svg" height="20" width="auto"> <span> Client</span>
+                    <img src="https://lancer-app.000webhostapp.com/images/svg/customer.svg" height="20" width="auto"> <span> Clients</span>
                 </a>
             </li>
-            <li class="@if(request()->path() == 'projects/status') active @endif">
+            <li class=" @if( preg_match("/^project.*$/", request()->path()) ) active @endif">
                 <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><img src="https://lancer-app.000webhostapp.com/images/svg/lightbulb.svg" height="20" width="auto"> <span> Projects</span></a>
                 <ul class="collapse list-unstyled " id="homeSubmenu">
                     <li>
-                        <a href="{{url('project/status')}}" class="pl-4"><i class="fas fa-dot-circle"></i> Status</a>
+                        <a href="{{url('project/status')}}" class="pl-4" @if( request()->path() == 'project/status'  )style="color:#0ABAB5;" @endif>
+                            <i class="fas fa-dot-circle"></i> Status
+                        </a>
                     </li>
                     <!-- <li>
                         <a href="{{url('project/overview')}}" class="pl-4"><i class="fas fa-dot-circle"></i> Overview</a>
                     </li> -->
                     <li>
-                        <a href="{{url('project/collaborators')}}" class="pl-4 "><i class="fas fa-dot-circle"></i> Collabrators</a>
+                        <a href="{{url('project/collaborators')}}" class="pl-4 " @if( preg_match( "/^project\/collaborators.*$/", request()->path()) ) style="color:#0ABAB5;" @endif>
+                            <i class="fas fa-dot-circle"></i> Collaborators
+                        </a>
                     </li>
                     <li>
-                        <a href="{{url('project/tasks')}}" class="pl-4"><i class="fas fa-dot-circle"></i> Task</a>
+                        <a href="{{url('project/tasks')}}" class="pl-4" @if( preg_match("/^project\/tasks.*$/",request()->path()) )style="color:#0ABAB5;" @endif>
+                            <i class="fas fa-dot-circle"></i> Tasks
+                        </a>
                     </li>
                     <!-- <li>
                         <a href="{{url('project/documents')}}" class="pl-4"><i class="fas fa-dot-circle"></i> Documents</a>
@@ -422,9 +428,9 @@ table.project-table thead tr th {
 
                 </ul>
             </li>
-            <li class="@if(request()->path() == 'invoices') active @endif">
+            <li class="@if( preg_match("/^invoice.*$/",request()->path()) ) active @endif">
                 <a href="{{url('invoices')}}">
-                    <img src="https://lancer-app.000webhostapp.com/images/svg/approve-invoice.svg" height="20" width="auto"> <span> Invoice</span>
+                    <img src="https://lancer-app.000webhostapp.com/images/svg/approve-invoice.svg" height="20" width="auto"> <span> Invoices</span>
                 </a>
             </li>
             <!-- <li>
@@ -462,12 +468,12 @@ table.project-table thead tr th {
                         </button>
                     </div>
                     <div class="col-6">
-                        <form class="form-inline my-2">
+                        <form class="form-inline my-2" action="clients/search" method="get">
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text border-right-0 bg-white" id="basic-addon1"><i class="fas fa-search"></i></span>
                                 </div>
-                                <input class="form-control border border-left-0 searchBox" type="text" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1">
+                                <input class="form-control border border-left-0 searchBox" type="search" name="search" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1">
                             </div>
                         </form>
                     </div>
@@ -483,7 +489,7 @@ table.project-table thead tr th {
                             <a class="nav-link p-3" href="{{ url('/contact') }}"><img src="https://lancer-app.000webhostapp.com/images/svg/help.svg" height="25" width="auto"> <span class="d-lg-none d-xl-none"> You need help?</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link border-left p-3" href="#"><img src="https://lancer-app.000webhostapp.com/images/svg/alarm-clock.svg" height="25" width="auto"> <span class="d-lg-none d-xl-none"> Reminder</span></a>
+                            <a class="nav-link border-left p-3" href="/notifications"><img src="https://lancer-app.000webhostapp.com/images/svg/alarm-clock.svg" height="25" width="auto"> <span class="d-lg-none d-xl-none"> Reminder</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link border-left p-3" href="/notifications"><img src="https://lancer-app.000webhostapp.com/images/svg/notification.svg" height="25" width="auto"> <span class="d-lg-none d-xl-none"> Notification</span></a>
@@ -494,7 +500,21 @@ table.project-table thead tr th {
                             <img  src="{{ asset(Auth::user()->profile_picture) }}" style="width: 30px; height: 30px; border-radius: 10%; pointer: finger;" alt="Profile Image">
                             @endif
                             @if(Auth::user()->profile_picture == 'user-default.png')
-                            <img  src="{{ asset('images/user-default.jpg') }}" style="width: 30px; height: 30px; border-radius: 10%; pointer: finger;" alt="Profile Image">
+                            <!--<img  src="{{ asset('images/user-default.jpg') }}" style="width: 30px; height: 30px; border-radius: 10%; pointer: finger;" alt="Profile Image">-->
+                            <div name="no-img" style="width: 30px; height: 30px; line-height: 30px; border-radius: 50%; pointer: finger; background-color: #ff9000; color: #fff; text-align: center; vertical-align: middle; " alt="Profile Image">
+                                @php
+                                    $count = 0;
+                                    $name = auth()->user()->name;
+                                    $nameArr = explode(' ',$name);
+                                    if(strlen($nameArr[0]) > 1){
+                                        $initials = strtoupper($nameArr[0][0]).strtolower($nameArr[0][1]);
+                                    }
+                                    else{
+                                        $initials = strtoupper($nameArr[0][0]);
+                                    }
+                                    echo htmlspecialchars($initials);
+                                @endphp
+                            </div>
                             @endif
                             </a>
                             <!-- <a class="nav-link border-left p-3" href="/dashboard/profile/settings"><span class="border rounded-circle p-1 font-weight-bold">
